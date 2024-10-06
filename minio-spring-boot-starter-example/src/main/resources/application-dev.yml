@@ -1,0 +1,59 @@
+# ----------------------------------------------------------------
+
+local:
+  config:
+    minio:
+      playground:
+        endpoint: "https://play.min.io"
+        accessKey: "Q3AM3UQ867SPQQA43P2F"
+        secretKey: "zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG"
+      local:
+        endpoint: "http://127.0.0.1:9000"
+        # dev.admin
+        #accessKey: "vNQc8ndSMIVb7pNs.dev"
+        #secretKey: "NwdZhp5qgHpAKMJCwbbMMx9pEWn5NALi3IeL.dev"
+        # default.minioadmin
+        accessKey: "uSloqshPrpXwZmGei6Gj"
+        secretKey: "GJOcYlunjSUarZO2Xvnip5ja8FIjADyiai0JNScB"
+
+# ----------------------------------------------------------------
+
+spring:
+  minio:
+    async:
+      enabled: false
+    sync:
+      enabled: true
+    endpoint: "${local.config.minio.local.endpoint}"
+    accessKey: "${local.config.minio.local.accessKey}"
+    secretKey: "${local.config.minio.local.secretKey}"
+
+# ----------------------------------------------------------------
+
+management:
+  endpoint:
+    shutdown:
+      enabled: true
+    health:
+      show-details: ALWAYS
+  endpoints:
+    web:
+      exposure:
+        # autoconfig & trace No mapping
+        # include: [health,info,beans,env,configprops,mappings,metrics]
+        include: "*"
+
+# ----------------------------------------------------------------
+
+# custom the /actuator/info endpoint
+#info:
+#  app:
+#    name: @project.artifactId@
+#    encoding: @project.build.sourceEncoding@
+#    java:
+#      source: @java.version@
+#      target: @java.version@
+#  evn:
+#    active: ${spring.profiles.active}
+
+# ----------------------------------------------------------------
