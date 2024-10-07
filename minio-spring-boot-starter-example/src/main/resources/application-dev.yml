@@ -21,7 +21,7 @@ local:
 spring:
   minio:
     async:
-      enabled: false
+      enabled: true
     sync:
       enabled: true
     endpoint: "${local.config.minio.local.endpoint}"

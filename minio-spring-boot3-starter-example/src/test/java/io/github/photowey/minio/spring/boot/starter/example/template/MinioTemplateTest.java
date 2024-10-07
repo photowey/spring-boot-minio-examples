@@ -40,24 +40,46 @@ class MinioTemplateTest extends AbstractTest {
 
     @Test
     void testCreateBuckets() {
-        boolean ok = this.minioTemplate.createBucket("fromzero");
+        String bucket = "fromzero";
+
+        boolean exists = this.minioTemplate.bucketExists(bucket);
+        Assertions.assertFalse(exists);
+
+        boolean ok = this.minioTemplate.createBucket(bucket);
         Assertions.assertTrue(ok);
 
-        boolean failed = this.minioTemplate.createBucket("fromzero");
+        boolean failed = this.minioTemplate.createBucket(bucket);
         Assertions.assertFalse(failed);
     }
 
     @Test
     void testBucketExists() {
-        boolean exists = this.minioTemplate.bucketExists("fromzero");
+        String bucket = "fromzero";
+
+        boolean exists = this.minioTemplate.bucketExists(bucket);
         Assertions.assertTrue(exists);
     }
 
     @Test
+    void testRemoveBuckets() {
+        String bucket = "delete.tester";
+
+        boolean ok = this.minioTemplate.createBucket(bucket);
+        Assertions.assertTrue(ok);
+
+        boolean removed = this.minioTemplate.removeBucket(bucket);
+        Assertions.assertTrue(removed);
+
+        boolean exists = this.minioTemplate.bucketExists(bucket);
+        Assertions.assertFalse(exists);
+    }
+
+    @Test
     void testUpload() throws Exception {
-        Resource resource = new ClassPathResource("pictures/linkinpark_from_zero.jpg");
         String bucket = "fromzero";
         String object = "linkinpark_from_zero.jpg";
+
+        Resource resource = new ClassPathResource("pictures/linkinpark_from_zero.jpg");
         this.minioTemplate.putObject(bucket, object, resource.getInputStream());
         String url = this.minioTemplate.url(bucket, object, 1, TimeUnit.MINUTES);
         log.info("the MinIO access url is: {}", url);
@@ -67,6 +89,7 @@ class MinioTemplateTest extends AbstractTest {
     void testDownload() throws Exception {
         String bucket = "fromzero";
         String object = "linkinpark_from_zero.jpg";
+
         try (InputStream stream = this.minioTemplate.downloadObject(bucket, object)) {
             String dir = System.getProperty("user.dir");
             if (!dir.endsWith(File.separator)) {

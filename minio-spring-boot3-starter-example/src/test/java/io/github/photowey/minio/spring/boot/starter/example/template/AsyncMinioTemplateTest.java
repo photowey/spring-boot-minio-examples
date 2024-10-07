@@ -28,35 +28,35 @@ import java.io.InputStream;
 import java.util.concurrent.TimeUnit;
 
 /**
- * {@code MinioTemplateTest}
+ * {@code AsyncMinioTemplateTest}
  *
  * @author photowey
- * @version 1.0.0
+ * @version 1.1.0
  * @since 2024/10/07
  */
 @Slf4j
 @SpringBootTest
-class MinioTemplateTest extends AbstractTest {
+class AsyncMinioTemplateTest extends AbstractTest {
 
     @Test
     void testCreateBuckets() {
-        String bucket = "linkinpark";
+        String bucket = "fromzero.async";
 
-        boolean exists = this.minioTemplate.bucketExists(bucket);
+        boolean exists = this.asyncMinioTemplate.bucketExists(bucket).join();
         Assertions.assertFalse(exists);
 
-        boolean ok = this.minioTemplate.createBucket(bucket);
+        boolean ok = this.asyncMinioTemplate.createBucket(bucket).join();
         Assertions.assertTrue(ok);
 
-        boolean failed = this.minioTemplate.createBucket(bucket);
+        boolean failed = this.asyncMinioTemplate.createBucket(bucket).join();
         Assertions.assertFalse(failed);
     }
 
     @Test
     void testBucketExists() {
-        String bucket = "linkinpark";
+        String bucket = "fromzero.async";
 
-        boolean exists = this.minioTemplate.bucketExists(bucket);
+        boolean exists = this.asyncMinioTemplate.bucketExists(bucket).join();
         Assertions.assertTrue(exists);
     }
 
@@ -64,40 +64,39 @@ class MinioTemplateTest extends AbstractTest {
     void testRemoveBuckets() {
         String bucket = "delete.tester";
 
-        boolean ok = this.minioTemplate.createBucket(bucket);
+        boolean ok = this.asyncMinioTemplate.createBucket(bucket).join();
         Assertions.assertTrue(ok);
 
-        boolean removed = this.minioTemplate.removeBucket(bucket);
+        boolean removed = this.asyncMinioTemplate.removeBucket(bucket).join();
         Assertions.assertTrue(removed);
 
-        boolean exists = this.minioTemplate.bucketExists(bucket);
+        boolean exists = this.asyncMinioTemplate.bucketExists(bucket).join();
         Assertions.assertFalse(exists);
     }
 
     @Test
     void testUpload() throws Exception {
-        String bucket = "linkinpark";
-        String object = "linkinpark.jpg";
+        String bucket = "fromzero.async";
+        String object = "linkinpark_from_zero_async.jpg";
 
-        Resource resource = new ClassPathResource("pictures/linkinpark.jpg");
-
-        this.minioTemplate.putObject(bucket, object, resource.getInputStream());
-        String url = this.minioTemplate.url(bucket, object, 1, TimeUnit.MINUTES);
-        log.info("the minIO access url is: {}", url);
+        Resource resource = new ClassPathResource("pictures/linkinpark_from_zero_async.jpg");
+        this.asyncMinioTemplate.putObject(bucket, object, resource.getInputStream());
+        String url = this.asyncMinioTemplate.url(bucket, object, 1, TimeUnit.MINUTES);
+        log.info("the MinIO access url is: {}", url);
     }
 
     @Test
     void testDownload() throws Exception {
-        String bucket = "linkinpark";
-        String object = "linkinpark.jpg";
+        String bucket = "fromzero.async";
+        String object = "linkinpark_from_zero_async.jpg";
 
-        try (InputStream stream = this.minioTemplate.downloadObject(bucket, object)) {
+        try (InputStream stream = this.asyncMinioTemplate.downloadObject(bucket, object).join();) {
             String dir = System.getProperty("user.dir");
             if (!dir.endsWith(File.separator)) {
                 dir += File.separator;
             }
 
-            String tmpFile = dir + "linkinpark.jpg";
+            String tmpFile = dir + "linkinpark_from_zero_async.jpg";
             this.write(tmpFile, true, stream.readAllBytes());
 
             File file = new File(tmpFile);

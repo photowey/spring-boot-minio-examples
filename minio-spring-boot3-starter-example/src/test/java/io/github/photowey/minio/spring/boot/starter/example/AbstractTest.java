@@ -15,6 +15,7 @@
  */
 package io.github.photowey.minio.spring.boot.starter.example;
 
+import io.github.photowey.minio.spring.boot.autoconfigure.template.AsyncMinioTemplate;
 import io.github.photowey.minio.spring.boot.autoconfigure.template.MinioTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -31,8 +32,10 @@ import java.nio.channels.FileChannel;
  */
 public abstract class AbstractTest {
 
-    @Autowired
+    @Autowired(required = false)
     protected MinioTemplate minioTemplate;
+    @Autowired(required = false)
+    protected AsyncMinioTemplate asyncMinioTemplate;
 
     protected void write(final String target, boolean quiet, final byte[] data) {
         try (RandomAccessFile raf = new RandomAccessFile(target, "rw");
